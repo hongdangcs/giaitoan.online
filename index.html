@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Giải Toán Online</title>
+    <link rel="stylesheet" href="assets/css/index.css" />
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <script
+      type="text/javascript"
+      async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"
+    ></script>
+  </head>
+  <body>
+    <div class="nav">
+      <div class="container">
+        <div class="logo">
+          <a href="/"><img src="assets/img/logo.jpeg" alt="logo" /></a>
+        </div>
+        <div class="menu">
+          <ul>
+            <li class="nav-item integral active">Giải Tích Phân</li>
+            <li class="nav-item differential">Giải Vi Phân</li>
+            <li class="nav-item derivative">Giải Đạo Hàm</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="expression-wrapper">
+      <div class="expression-div integral-expression active-expression">
+        <div class="integral-expression__title">
+          <h2>Giải Tích Phân</h2>
+        </div>
+        <div class="integral-expression__content">
+          <form
+            hx-post="/integral-form"
+            hx-trigger="submit"
+            hx-target="#result"
+            id="integral-form"
+          >
+            <div class="__content__input">
+              <label for="integral-expression-input">Nhập biểu thức</label>
+              <input
+                type="text"
+                name="integral-expression-input"
+                placeholder="Nhập biểu thức"
+              />
+            </div>
+            <div class="bound-input">
+              <div class="bound-input__content">
+                <div class="__content__input">
+                  <label for="lower-bound">Cận dưới</label>
+                  <input
+                    type="text"
+                    name="lower-bound"
+                    placeholder="Cận dưới"
+                    id="lower-bound"
+                  />
+                </div>
+                <div class="__content__input">
+                  <label for="upper-bound">Cận trên</label>
+                  <input
+                    type="text"
+                    id="upper-bound"
+                    name="upper-bound"
+                    placeholder="Cận trên"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="integral-expression__content__btn">
+              <input
+                type="text"
+                name="expression-value"
+                id="expression-value"
+                style="display: none"
+              />
+              <input
+                type="text"
+                name="expression-value-collapse"
+                id="expression-value-collapse"
+                style="display: none"
+              />
+
+              <button type="submit">Giải</button>
+            </div>
+          </form>
+          <div class="validate-exception" style="display: none">
+            <p>Vui lòng không bỏ trống biểu thức!</p>
+          </div>
+        </div>
+      </div>
+      <div class="expression-div differential-expression">
+        <div class="differential-expression__title">
+          <h2>Giải Vi Phân</h2>
+        </div>
+        <div class="differential-expression__content">
+          <form action="">
+            <div class="differential-expression__content__input">
+              <input type="text" placeholder="Nhập biểu thức" />
+            </div>
+            <div class="differential-expression__content__btn">
+              <button type="submit">Giải</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="expression-div derivative-expression">
+        <div class="derivative-expression__title">
+          <h2>Giải Đạo Hàm</h2>
+        </div>
+        <div class="derivative-expression__content">
+          <form action="">
+            <div class="derivative-expression__content__input">
+              <input type="text" placeholder="Nhập biểu thức" />
+            </div>
+            <div class="derivative-expression__content__btn">
+              <button type="submit">Giải</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="result">
+      <div class="result-wrapper">
+        <div class="result__title">
+          <h2>Lời giải</h2>
+        </div>
+        <div id="result">
+          {{ block "executed-expression" .}}
+          <div class="bieu-thuc">{{ .Expression }}</div>
+          <div class="loi-giai">{{ .StepByStep }}</div>
+          <div class="dap-an">{{ .Result }}</div>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+    <script>
+      const navItems = document.querySelectorAll(".nav-item");
+      const expressionDivs = document.querySelectorAll(".expression-div");
+      navItems.forEach((navItem, index) => {
+        navItem.addEventListener("click", () => {
+          navItems.forEach((navItem) => {
+            navItem.classList.remove("active");
+          });
+          navItem.classList.add("active");
+          expressionDivs.forEach((expressionDiv) => {
+            expressionDiv.classList.remove("active-expression");
+          });
+          expressionDivs[index].classList.add("active-expression");
+        });
+      });
+
+      const validateException = document.querySelector(".validate-exception");
+
+      document
+        .getElementById("integral-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          validateException.style.display = "none";
+          var inputField = document.querySelector(
+            'input[name="integral-expression-input"]'
+          );
+          expression = inputField.value;
+          var expressionValue = document.querySelector(
+            'input[name="expression-value"]'
+          );
+          var expressionValueCollapse = document.querySelector(
+            'input[name="expression-value-collapse"]'
+          );
+          var lowerBound = document.querySelector('input[name="lower-bound"]');
+          var upperBound = document.querySelector('input[name="upper-bound"]');
+          if (
+            expression === "" ||
+            lowerBound.value === "" ||
+            upperBound.value === ""
+          ) {
+            validateException.style.display = "block";
+            return;
+          }
+          let aa = Ca(expression);
+          expressionValueCollapse.value = "" + Ea(Ha(aa));
+
+          expressionValue.value = encodeMathExpression(expression);
+          expressionValueCollapse.value = encodeMathExpression(
+            expressionValueCollapse.value
+          );
+
+          this.htmx.trigger("htmx:hxTrigger", { trigger: "submit" });
+        });
+      document.body.addEventListener("htmx:afterOnLoad", function () {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+      });
+    </script>
+    <script src="assets/js/index.js"></script>
+  </body>
+</html>
