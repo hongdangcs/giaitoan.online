@@ -54,7 +54,16 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8000", nil))
 
 	//simple test
-
+	/*
+		http.Handle(
+			"/",
+			//print hello world
+			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprintln(w, "Hello, world!")
+			}),
+		)
+		log.Fatal(http.ListenAndServe(":8000", nil))
+	*/
 }
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
