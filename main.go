@@ -45,20 +45,15 @@ type ExpressionResponse struct {
 }
 
 func main() {
-	//fmt.Println("Go app...")
-	//
-	//http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
-	//http.HandleFunc("/", handleIndex)
-	//http.HandleFunc("/integral-form", handleIntegralForm)
-	//
-	//log.Fatal(http.ListenAndServe(":8000", nil))
+	fmt.Println("Go app...")
+
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
+	http.HandleFunc("/", handleIndex)
+	http.HandleFunc("/integral-form", handleIntegralForm)
+
+	log.Fatal(http.ListenAndServe(":8000", nil))
 
 	//simple test
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, %q", r.URL.Path)
-	})
-
-	http.ListenAndServe(":8000", nil)
 
 }
 
