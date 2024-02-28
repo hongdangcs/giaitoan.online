@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -44,10 +45,14 @@ type ExpressionResponse struct {
 	Result     string        `json:"result"`
 }
 
+var dir, _ = os.Getwd()
+
+// var dir, _ = filepath.Abs(filepath.Dir(os.Args[0]))
+
 func main() {
 	fmt.Println("Go app...")
 
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(dir+"/assets"))))
 	http.HandleFunc("/", handleIndex)
 	http.HandleFunc("/integral-form", handleIntegralForm)
 
@@ -67,7 +72,7 @@ func main() {
 }
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("index.html"))
+	tmpl := template.Must(template.ParseFiles(dir + "/index.html"))
 	tmpl.ExecuteTemplate(w, "index.html", nil)
 }
 
@@ -79,7 +84,7 @@ func handleIntegralForm(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to parse form", http.StatusInternalServerError)
 		return
 	}
-	tmpl := template.Must(template.ParseFiles("index.html"))
+	tmpl := template.Must(template.ParseFiles(dir + "/index.html"))
 
 	collapseInput := r.FormValue("expression-value-collapse")
 	expression := r.PostFormValue("expression-value")
